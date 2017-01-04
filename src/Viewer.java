@@ -28,7 +28,7 @@ class Selection {
 *  Viewer
 **********************************************************************/
 
-public class Viewer extends Canvas implements AdjustmentListener, UpdateEventListener {
+public class Viewer extends Canvas implements AdjustmentListener, Text.UpdateEventListener {
 	static final int    TOP = 5;    // top margin
 	static final int    BOTTOM = 5; // bottom margin
 	static final int    LEFT = 5;   // left margin
@@ -400,7 +400,7 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 *  text drawing
 *-----------------------------------------------------------*/
 
-	public void update(UpdateEvent e) {
+	public void update(Text.UpdateEvent e) {
 		StringBuffer b;
 		g = getGraphics();
 		FontMetrics m = g.getFontMetrics();

@@ -1,19 +1,6 @@
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
-
-interface UpdateEventListener {
-	void update(UpdateEvent e);
-}
-
-class UpdateEvent {  // [from..to[ was replaced by text
-	int from;
-	int to;
-	String text;
-	UpdateEvent(int a, int b, String t) { from = a; to = b; text = t; }
-}
 
 /*******************************************************************
 *   Gap text

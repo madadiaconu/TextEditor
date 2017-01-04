@@ -59,6 +59,7 @@ public class PieceListText extends Text {
             e.printStackTrace();
         }
         p.len++; len++;
+        notify(new UpdateEvent(pos, pos, s));
     }
 
     private Piece split(int pos) {
@@ -66,7 +67,7 @@ public class PieceListText extends Text {
         //--- set p to piece containing pos
         Piece p = firstPiece;
         long len = p.len;
-        while (pos > len) {
+        while (pos > len && p.next != null) {
             p = p.next;
             len = len + p.len;
         }
@@ -83,13 +84,14 @@ public class PieceListText extends Text {
     }
 
     private boolean isLastPieceOnScratchFile(Piece p) {
-        return p.next.file != scratch;
+        return p.next == null || p.next.file != scratch;
     }
 
     public void delete (int from, int to) {
         Piece a = split(from);
         Piece b = split(to);
         a.next = b.next;
+        notify(new UpdateEvent(from, to, null));
     }
 
     @Override

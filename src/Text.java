@@ -6,6 +6,18 @@ import java.util.Iterator;
  * Interface implemented by text data structures
  */
 public abstract class Text {
+
+    interface UpdateEventListener {
+        void update(UpdateEvent e);
+    }
+
+    class UpdateEvent {  // [from..to[ was replaced by text
+        int from;
+        int to;
+        String text;
+        UpdateEvent(int a, int b, String t) { from = a; to = b; text = t; }
+    }
+
     protected int len;     // number of characters in the text buffer
 
     public abstract void insert(int pos, String s);
