@@ -20,9 +20,11 @@ public class Editor {
 		}
 
 		JScrollBar scrollBar = new JScrollBar(Adjustable.VERTICAL, 0, 0, 0, 0);
-		Viewer viewer = new Viewer(new PieceListText(path), scrollBar);
+		JComboBox<Font> comboBox = new JComboBox<>();
+		Viewer viewer = new Viewer(new PieceListText(path), scrollBar, comboBox);
 
 		JPanel panel = new JPanel(new BorderLayout());
+		panel.add("North",comboBox);
 		panel.add("Center", viewer);
 		panel.add("East", scrollBar);
 

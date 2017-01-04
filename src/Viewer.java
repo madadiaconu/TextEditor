@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.JScrollBar;
+import javax.swing.*;
 import java.util.Collections;
 
 class Line {
@@ -40,17 +40,30 @@ public class Viewer extends Canvas implements AdjustmentListener, Text.UpdateEve
 	int firstTpos = 0;     // first text position in this viewer
 	int lastTpos;          // last text position in this viewer
 	JScrollBar scrollBar;
+	JComboBox<Font> fontDropDown;
 	Selection sel = null;
 	Position caret;
 	Position lastPos;      // last mouse position: used during mouse dragging
 	Graphics g;
 
-	public Viewer(Text t, JScrollBar sb) {
+	public Viewer(Text t, JScrollBar sb, JComboBox<Font> cb) {
 		scrollBar = sb;
 		scrollBar.addAdjustmentListener(this);
 		scrollBar.setMaximum(t.length());
 		scrollBar.setUnitIncrement(50);
 		scrollBar.setBlockIncrement(500);
+		fontDropDown = cb;
+		fontDropDown.setModel(new DefaultComboBoxModel<Font>(GraphicsEnvironment.
+                getLocalGraphicsEnvironment().getAllFonts()));
+		fontDropDown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                Font font = (Font) value;
+                setText(font.getFontName());
+                return this;
+            }
+        });
 		text = t;
 		text.addUpdateEventListener(this);
 		this.addKeyListener(new KeyAdapter() {
@@ -373,7 +386,11 @@ public class Viewer extends Canvas implements AdjustmentListener, Text.UpdateEve
 				ch = text.charAt(pos);
 			}
 			boolean eol = ch == '\n';
-			if (eol) { buf.append(ch); pos++; ch = text.charAt(pos); }
+			if (eol) {
+			    buf.append(ch);
+			    pos++;
+			    ch = text.charAt(pos);
+			}
 			line.len = buf.length();
 			line.text = buf.toString();
 			line.x = LEFT;
@@ -403,6 +420,7 @@ public class Viewer extends Canvas implements AdjustmentListener, Text.UpdateEve
 	public void update(Text.UpdateEvent e) {
 		StringBuffer b;
 		g = getGraphics();
+		g.setFont((Font)fontDropDown.getSelectedItem());
 		FontMetrics m = g.getFontMetrics();
 		Position pos = caret;
 

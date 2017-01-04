@@ -1,3 +1,5 @@
+import javax.swing.text.Style;
+import java.awt.*;
 import java.io.*;
 
 class Piece { // descriptor
@@ -5,6 +7,8 @@ class Piece { // descriptor
     File file; // file containing this piece
     long filePos; // offset from beginning of file
     Piece next;
+    Font font;
+    Style style;
 
     public Piece() {
         this.len = 0;
@@ -18,6 +22,12 @@ class Piece { // descriptor
         this.file = file;
         this.filePos = filePos;
         this.next = null;
+    }
+
+    public Piece (long len, File file, long filePos, Font font, Style style) {
+        this(len, file, filePos);
+        this.font = font;
+        this.style = style;
     }
 }
 
