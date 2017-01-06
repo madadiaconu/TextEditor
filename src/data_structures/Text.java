@@ -1,3 +1,8 @@
+package data_structures;
+
+import gui.event_handling.UpdateEvent;
+import gui.event_handling.UpdateEventListener;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -6,17 +11,6 @@ import java.util.Iterator;
  * Interface implemented by text data structures
  */
 public abstract class Text {
-
-    interface UpdateEventListener {
-        void update(UpdateEvent e);
-    }
-
-    class UpdateEvent {  // [from..to[ was replaced by text
-        int from;
-        int to;
-        String text;
-        UpdateEvent(int a, int b, String t) { from = a; to = b; text = t; }
-    }
 
     protected int len;     // number of characters in the text buffer
 
@@ -45,7 +39,7 @@ public abstract class Text {
         listeners.remove(listener);
     }
 
-    protected void notify(UpdateEvent e) {
+    public void notify(UpdateEvent e) {
         Iterator iter = listeners.iterator();
         while (iter.hasNext()) {
             UpdateEventListener listener = (UpdateEventListener)iter.next();

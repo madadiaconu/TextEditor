@@ -1,3 +1,6 @@
+import data_structures.GapText;
+import gui.Viewer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +24,7 @@ public class Editor {
 
 		JScrollBar scrollBar = new JScrollBar(Adjustable.VERTICAL, 0, 0, 0, 0);
 		JComboBox<Font> comboBox = new JComboBox<>();
-		Viewer viewer = new Viewer(new PieceListText(path), scrollBar, comboBox);
+		Viewer viewer = new Viewer(new GapText(path), scrollBar, comboBox);
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add("North",comboBox);

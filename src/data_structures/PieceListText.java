@@ -1,35 +1,7 @@
-import javax.swing.text.Style;
-import java.awt.*;
+package data_structures;
+
+import gui.event_handling.UpdateEvent;
 import java.io.*;
-
-class Piece { // descriptor
-    long len; // length of this piece
-    File file; // file containing this piece
-    long filePos; // offset from beginning of file
-    Piece next;
-    Font font;
-    Style style;
-
-    public Piece() {
-        this.len = 0;
-        this.file = null;
-        this.filePos = 0;
-        this.next = null;
-    }
-
-    public Piece (long len, File file, long filePos) {
-        this.len = len;
-        this.file = file;
-        this.filePos = filePos;
-        this.next = null;
-    }
-
-    public Piece (long len, File file, long filePos, Font font, Style style) {
-        this(len, file, filePos);
-        this.font = font;
-        this.style = style;
-    }
-}
 
 
 /**
@@ -58,7 +30,7 @@ public class PieceListText extends Text {
         Piece p = split(pos); // split piece at pos
         if (!isLastPieceOnScratchFile(p)) {
             Piece q = new Piece(0, scratch, scratch.length());
-            q.next = p.next; p.next = q;
+            q.setNext(p.getNext()); p.setNext(q);
             p = q;
         }
         try {
@@ -68,7 +40,7 @@ public class PieceListText extends Text {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        p.len++; len++;
+        p.setLen(p.getLen()+1); len++;
         notify(new UpdateEvent(pos, pos, s));
     }
 
@@ -76,31 +48,31 @@ public class PieceListText extends Text {
         if (pos == 0) return firstPiece;
         //--- set p to piece containing pos
         Piece p = firstPiece;
-        long len = p.len;
-        while (pos > len && p.next != null) {
-            p = p.next;
-            len = len + p.len;
+        long len = p.getLen();
+        while (pos > len && p.getNext() != null) {
+            p = p.getNext();
+            len = len + p.getLen();
         }
         //--- split piece p
         if (pos != len) {
             long len2 = len - pos;
-            long len1 = p.len - len2;
-            p.len = len1;
-            Piece q = new Piece(len2, p.file, p.filePos + len1);
-            q.next = p.next;
-            p.next = q;
+            long len1 = p.getLen() - len2;
+            p.setLen(len1);
+            Piece q = new Piece(len2, p.getFile(), p.getFilePos() + len1);
+            q.setNext(p.getNext());
+            p.setNext(q);
         }
         return p;
     }
 
     private boolean isLastPieceOnScratchFile(Piece p) {
-        return p.next == null || p.next.file != scratch;
+        return p.getNext() == null || p.getNext().getFile() != scratch;
     }
 
     public void delete (int from, int to) {
         Piece a = split(from);
         Piece b = split(to);
-        a.next = b.next;
+        a.setNext(b.getNext());
         notify(new UpdateEvent(from, to, null));
     }
 
@@ -110,10 +82,10 @@ public class PieceListText extends Text {
         Piece p = getPieceForPosition(pos);
         InputStream in;
         try {
-            in = new FileInputStream(p.file);
+            in = new FileInputStream(p.getFile());
             Reader reader = new InputStreamReader(in, "UTF-8");
             int r, i=0;
-            while ((r = reader.read()) != -1 && i<p.filePos+pos) {
+            while ((r = reader.read()) != -1 && i<p.getFilePos()+pos) {
                 i++;
             }
             return (char) r;
@@ -126,9 +98,9 @@ public class PieceListText extends Text {
     private Piece getPieceForPosition (int pos) {
         Piece p = firstPiece;
         int currentPos = 0;
-        while (p.next != null && currentPos + p.len < pos) {
-            currentPos += p.len;
-            p = p.next;
+        while (p.getNext() != null && currentPos + p.getLen() < pos) {
+            currentPos += p.getLen();
+            p = p.getNext();
         }
         return p;
     }

@@ -1,3 +1,7 @@
+package data_structures;
+
+import gui.event_handling.UpdateEvent;
+
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -6,7 +10,7 @@ import java.io.IOException;
 *   Gap text
 *******************************************************************/
 
-public class GapText extends Text{
+public class GapText extends Text {
 	char[] buf;  // text buffer
 	int bufLen;  // max. capacity of the text buffer
 	int gapPos;  // position of the gap
