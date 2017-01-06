@@ -13,17 +13,15 @@ public class PieceListText extends Text {
     Piece firstPiece;
     File scratch;
 
-    public PieceListText(String fn) {
+    public PieceListText(String fn) throws FileNotFoundException {
         super(fn);
         scratch = new File("scratch_file");
-        try {
-            FileInputStream s = new FileInputStream(fn);
-            len = s.available();
-            firstPiece = new Piece(len, new File(fn),0);
-        } catch (IOException e) {
-            len = 0;
-            firstPiece = new Piece();
-        }
+        scratch.delete();
+        FileInputStream s = new FileInputStream(fn);
+        firstPiece = new Piece();
+        File f = new File(fn);
+        len = f.length();
+        firstPiece.setNext(new Piece(len, new File(fn), 0));
     }
 
     public void insert (int pos, String s) {
@@ -33,40 +31,37 @@ public class PieceListText extends Text {
             q.setNext(p.getNext()); p.setNext(q);
             p = q;
         }
-        try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(scratch, true), "UTF-8"));
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(scratch, true), "UTF-8"))) {
             writer.write(s);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        p.setLen(p.getLen()+1); len++;
+        p.setLen(p.getLen()+s.length()); len += s.length();
         notify(new UpdateEvent(pos, pos, s));
     }
 
+
+    /**
+     * @param pos insertion position
+     * @return the piece before the insert
+     */
     private Piece split(int pos) {
-        if (pos == 0) return firstPiece;
-        //--- set p to piece containing pos
-        Piece p = firstPiece;
-        long len = p.getLen();
-        while (pos > len && p.getNext() != null) {
-            p = p.getNext();
-            len = len + p.getLen();
-        }
-        //--- split piece p
+        Piece pieceContainingPos = getPieceForPosition(pos);
+        long len = getLenUntilPiece(pieceContainingPos);
         if (pos != len) {
-            long len2 = len - pos;
-            long len1 = p.getLen() - len2;
-            p.setLen(len1);
-            Piece q = new Piece(len2, p.getFile(), p.getFilePos() + len1);
-            q.setNext(p.getNext());
-            p.setNext(q);
+            long secondPieceLen = len - pos;
+            long firstPieceLen = pieceContainingPos.getLen() - secondPieceLen;
+            pieceContainingPos.setLen(firstPieceLen);
+            Piece pieceAfterInsertion = new Piece(secondPieceLen, pieceContainingPos.getFile(), pieceContainingPos.getFilePos() + firstPieceLen);
+            pieceAfterInsertion.setNext(pieceContainingPos.getNext());
+            pieceContainingPos.setNext(pieceAfterInsertion);
         }
-        return p;
+        return pieceContainingPos;
     }
 
     private boolean isLastPieceOnScratchFile(Piece p) {
-        return p.getNext() == null || p.getNext().getFile() != scratch;
+        return p.getFile() != null && p.getFile().equals(scratch) && p.getFilePos()+p.getLen() == scratch.length();
     }
 
     public void delete (int from, int to) {
@@ -80,13 +75,16 @@ public class PieceListText extends Text {
     public char charAt(int pos) {
         if (pos < 0 || pos >= len) return '\0';
         Piece p = getPieceForPosition(pos);
-        InputStream in;
-        try {
-            in = new FileInputStream(p.getFile());
+        while (p.getLen() == 0) { //ignore dummy pieces
+            p = p.getNext();
+        }
+        try (InputStream in = new FileInputStream(p.getFile())){
             Reader reader = new InputStreamReader(in, "UTF-8");
-            int r, i=0;
-            while ((r = reader.read()) != -1 && i<p.getFilePos()+pos) {
-                i++;
+            int r;
+            reader.skip(p.getFilePos()+(pos - (getLenUntilPiece(p) - p.getLen())));
+            r =  reader.read();
+            if (r == -1) {
+                return '\0';
             }
             return (char) r;
         } catch (IOException e) {
@@ -95,13 +93,31 @@ public class PieceListText extends Text {
         }
     }
 
+    /**
+     * @param pos the position contained by the returned piece
+     * @return piece containing pos
+     */
     private Piece getPieceForPosition (int pos) {
-        Piece p = firstPiece;
-        int currentPos = 0;
-        while (p.getNext() != null && currentPos + p.getLen() < pos) {
-            currentPos += p.getLen();
-            p = p.getNext();
+        Piece cur = firstPiece;
+        long totalLenUpToCur = cur.getLen();
+        while (pos >= totalLenUpToCur && cur.getNext() != null) {
+            cur = cur.getNext();
+            totalLenUpToCur = totalLenUpToCur + cur.getLen();
         }
-        return p;
+        return cur;
+    }
+
+    /**
+     * @param searchedForPiece
+     * @return length up to the piece, including it
+     */
+    private long getLenUntilPiece (Piece searchedForPiece) {
+        Piece currentPiece = firstPiece;
+        long len = currentPiece.getLen();
+        while (currentPiece != searchedForPiece) {
+            currentPiece = currentPiece.getNext();
+            len = len + currentPiece.getLen();
+        }
+        return len;
     }
 }

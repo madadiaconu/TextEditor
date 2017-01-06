@@ -1,4 +1,4 @@
-import data_structures.GapText;
+import data_structures.PieceListText;
 import gui.Viewer;
 
 import javax.swing.*;
@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 
 public class Editor {
 
-	public static void main(String[] arg) {
+	public static void main(String[] arg) throws FileNotFoundException {
 		if (arg.length < 1) {
 			System.out.println("-- file name missing");
 			return;
@@ -24,7 +24,7 @@ public class Editor {
 
 		JScrollBar scrollBar = new JScrollBar(Adjustable.VERTICAL, 0, 0, 0, 0);
 		JComboBox<Font> comboBox = new JComboBox<>();
-		Viewer viewer = new Viewer(new GapText(path), scrollBar, comboBox);
+		Viewer viewer = new Viewer(new PieceListText(path), scrollBar, comboBox);
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add("North",comboBox);

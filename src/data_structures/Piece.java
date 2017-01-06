@@ -39,47 +39,31 @@ public class Piece { // descriptor
         return len;
     }
 
-    public void setLen(long len) {
-        this.len = len;
-    }
-
     public File getFile() {
         return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 
     public long getFilePos() {
         return filePos;
     }
 
-    public void setFilePos(long filePos) {
-        this.filePos = filePos;
-    }
-
     public Piece getNext() {
         return next;
-    }
-
-    public void setNext(Piece next) {
-        this.next = next;
     }
 
     public Font getFont() {
         return font;
     }
 
-    public void setFont(Font font) {
-        this.font = font;
-    }
-
     public Style getStyle() {
         return style;
     }
 
-    public void setStyle(Style style) {
-        this.style = style;
+    public void setNext(Piece next) {
+        this.next = next;
+    }
+
+    public void setLen(long len) {
+        this.len = len;
     }
 }

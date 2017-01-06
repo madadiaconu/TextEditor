@@ -12,7 +12,7 @@ import java.util.Iterator;
  */
 public abstract class Text {
 
-    protected int len;     // number of characters in the text buffer
+    protected long len;     // number of characters in the text buffer
 
     public abstract void insert(int pos, String s);
     public abstract void delete(int from, int to);
@@ -22,7 +22,7 @@ public abstract class Text {
 
     }
 
-    public int length() {
+    public long length() {
         return len;
     }
 

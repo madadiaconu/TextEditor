@@ -34,7 +34,7 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 	public Viewer(Text t, JScrollBar sb, JComboBox<Font> cb) {
 		scrollBar = sb;
 		scrollBar.addAdjustmentListener(this);
-		scrollBar.setMaximum(t.length());
+		scrollBar.setMaximum((int)t.length());
 		scrollBar.setUnitIncrement(50);
 		scrollBar.setBlockIncrement(500);
 		fontDropDown = cb;
@@ -270,7 +270,7 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 			} else {
 				text.insert(caret.getPosInText(), String.valueOf(ch));
 			}
-			scrollBar.setValues(firstVisibleTextPos, 0, 0, text.length());
+			scrollBar.setValues(firstVisibleTextPos, 0, 0, (int)text.length());
 		}
 	}
 
@@ -405,7 +405,12 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 		Line line = pos.getLine();
 		Line prev = line.getPrev();
 		line = fill(line.getY(), getHeight() - BOTTOM, pos.getPosFirstCharInText());
-		if (prev == null) firstLine = line; else { prev.setNext(line); line.setPrev(prev); }
+		if (prev == null)
+			firstLine = line;
+		else {
+			prev.setNext(line);
+			line.setPrev(prev);
+		}
 		repaint(LEFT, line.getY(), getWidth(), getHeight());
 	}
 
@@ -420,25 +425,10 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 		Position pos = caret;
 
 		if (e.getFrom() == e.getTo()) { // insert
-			if (e.getFrom() != caret.getPosInText()) pos = getPos(e.getFrom());
-			int newCarPos = pos.getPosInText() + e.getText().length();
-			if (e.getText().indexOf(CRLF) >= 0) {
-				rebuildFrom(pos);
-				if (pos.getY() + pos.getLine().getH() > getHeight() - BOTTOM)
-					scrollBar.setValue(firstVisibleTextPos + firstLine.getLen());
-			} else {
-				b = new StringBuffer(pos.getLine().getText());
-				b.insert(pos.getPosInLine(), e.getText());
-				pos.getLine().setText(b.toString());
-				pos.getLine().setW(stringWidth(m, e.getText()));
-				pos.getLine().setLen(pos.getLine().getLen() + e.getText().length());
-				lastVisibleTextPos += e.getText().length();
-				repaint(pos.getLine().getX(), pos.getLine().getY(), getWidth(), pos.getLine().getH()+1);
-			}
-			setCaret(newCarPos);
-
+			handleInsert(e, pos, m);
 		} else if (e.getText() == null) { // delete
-			if (caret == null || e.getTo() != caret.getPosInText()) pos = getPos(e.getTo());
+			if (caret == null || e.getTo() != caret.getPosInText())
+				pos = getPos(e.getTo());
 			int d = e.getTo() - e.getFrom();
 			if (pos.getPosInLine() - d < 0) { // delete across lines
 				rebuildFrom(getPos(e.getFrom()));
@@ -453,6 +443,38 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 			}
 			setCaret(e.getFrom());
 		}
+	}
+
+	private void handleInsert(UpdateEvent e, Position pos, FontMetrics m) {
+		if (e.getFrom() != caret.getPosInText())
+			pos = getPos(e.getFrom());
+		int newCarPos = pos.getPosInText() + e.getText().length();
+		if (e.getText().indexOf(CRLF) >= 0) {
+			insertNewLine(pos);
+		} else {
+			insertCharacter(pos, e.getText(), m);
+		}
+		setCaret(newCarPos);
+	}
+
+	private void insertNewLine (Position pos) {
+		rebuildFrom(pos);
+		if (pos.getY() + pos.getLine().getH() > getHeight() - BOTTOM)
+			scrollBar.setValue(firstVisibleTextPos + firstLine.getLen());
+	}
+
+	private void insertCharacter(Position pos, String ch, FontMetrics m) {
+		StringBuffer b = new StringBuffer(pos.getLine().getText());
+		b.insert(pos.getPosInLine(), ch);
+		pos.getLine().setText(b.toString());
+		pos.getLine().setW(pos.getLine().getW() + stringWidth(m, ch));
+		pos.getLine().setLen(pos.getLine().getLen() + ch.length());
+		lastVisibleTextPos += ch.length();
+		repaint(pos.getLine().getX(), pos.getLine().getY(), getWidth(), pos.getLine().getH()+1);
+	}
+
+	private void updateAfterDelete() {
+
 	}
 
 	public void paint(Graphics g) {
