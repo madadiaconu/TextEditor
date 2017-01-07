@@ -55,9 +55,11 @@ public class Editor {
         JMenuItem cutAction = new JMenuItem("Cut");
         JMenuItem copyAction = new JMenuItem("Copy");
         JMenuItem pasteAction = new JMenuItem("Paste");
+        JMenuItem findAction = new JMenuItem("Find");
         editMenu.add(cutAction);
         editMenu.add(copyAction);
         editMenu.add(pasteAction);
+        editMenu.add(findAction);
 
         JFrame frame = new JFrame(title);
 		frame.setJMenuBar(menuBar);
@@ -116,6 +118,37 @@ public class Editor {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 viewer.paste();
+            }
+        });
+
+		findAction.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JTextField textField = new JTextField();
+                JButton searchButton = new JButton();
+                searchButton.setText("Search");
+                searchButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        viewer.find(textField.getText());
+                    }
+                });
+
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.add("North",textField);
+                panel.add("Center", searchButton);
+
+                JFrame frame = new JFrame("Find");
+                frame.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e) {
+                        frame.setVisible(false);
+                    }
+                });
+                frame.setSize(150, 50);
+                frame.setResizable(false);
+                frame.setContentPane(panel);
+                frame.setVisible(true);
+                frame.getContentPane().repaint();
             }
         });
 

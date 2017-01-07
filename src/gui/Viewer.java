@@ -9,6 +9,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.Collections;
 
+import java.util.List;
 /**********************************************************************
 *  gui.Viewer
 **********************************************************************/
@@ -30,6 +31,9 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 	Position caret;
 	Position lastMousePos;      // last mouse position: used during mouse dragging
 	Graphics g;
+
+	String prevSearch;
+	List<Integer> prevSearchPos;
 
 	public Viewer(PieceListText t, JScrollBar sb, JComboBox<Font> cb) {
         g = getGraphics();
@@ -536,6 +540,23 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 
 	public void paste() {
 		text.paste(caret.getPosInText());
-
 	}
+
+	public void find(String term) {
+	    resetSelection();
+	    prevSearch = term;
+	    List<Integer> positions = text.find(term);
+        prevSearchPos = positions;
+        for (Integer pos: positions) {
+	        setSelection(pos,pos+term.length());
+        }
+    }
+
+    private void resetSelection() {
+	    if (prevSearchPos != null) {
+            for (Integer pos : prevSearchPos) {
+                setSelection(pos, pos + prevSearch.length());
+            }
+        }
+    }
 }
