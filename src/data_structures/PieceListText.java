@@ -14,6 +14,7 @@ public class PieceListText extends Text {
 
     private Piece firstPiece;
     private File scratch;
+    private String clipboard;
 
     public PieceListText(String fn) throws FileNotFoundException {
         super(fn);
@@ -186,5 +187,36 @@ public class PieceListText extends Text {
             }
         }
         return "";
+    }
+
+    public String getText (int from, int to) {
+        Piece currentPiece = split(from).getNext(); //get first piece of selection
+        Piece lastPieceInSelection = split(to);
+        StringBuilder text = new StringBuilder();
+        text.append(getTextInPiece(currentPiece));
+        if (currentPiece != lastPieceInSelection) {
+            while (currentPiece.getNext() != lastPieceInSelection) {
+                currentPiece = currentPiece.getNext();
+                text.append(getTextInPiece(currentPiece));
+            }
+        }
+        return text.toString();
+    }
+
+    public void copy(int from, int to) {
+        clipboard = getText(from, to);
+    }
+
+    public void cut(int from, int to) {
+        clipboard = getText(from, to);
+        delete(from, to);
+    }
+
+    public void paste(int to) {
+        insert(to, clipboard);
+    }
+
+    public String getClipboard() {
+        return clipboard;
     }
 }

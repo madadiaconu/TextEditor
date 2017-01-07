@@ -157,6 +157,48 @@ public class PieceListTextTest {
         assertThat(thirdPiece.getNext().getNext().getFont()).isEqualTo(null);
     }
 
+    @Test
+    public void cut() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        text.cut(1,3);
+        List<String> result = getLines(text);
+        assertThat(text.getClipboard()).isEqualTo("in");
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo("Le 1\n");
+        assertThat(result.get(1)).isEqualTo("\n");
+        assertThat(result.get(2)).isEqualTo("Line 3\n");
+    }
+
+
+    @Test
+    public void copy() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        text.copy(1,3);
+        List<String> result = getLines(text);
+        assertThat(text.getClipboard()).isEqualTo("in");
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo("Line 1\n");
+        assertThat(result.get(1)).isEqualTo("\n");
+        assertThat(result.get(2)).isEqualTo("Line 3\n");
+    }
+
+
+    @Test
+    public void paste() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        text.cut(1,3);
+        text.paste(7);
+        List<String> result = getLines(text);
+        assertThat(text.getClipboard()).isEqualTo("in");
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo("Le 1\n");
+        assertThat(result.get(1)).isEqualTo("\n");
+        assertThat(result.get(2)).isEqualTo("Linine 3\n");
+    }
+
     private List<String> getLines(PieceListText list) {
         List<String> result = new ArrayList<>();
         int pos = 0;

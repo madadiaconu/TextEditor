@@ -43,14 +43,23 @@ public class Editor {
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+		JMenu editMenu = new JMenu("Edit");
 		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
 
 		JMenuItem openAction = new JMenuItem("Open");
 		JMenuItem saveAction = new JMenuItem("Save");
-		fileMenu.add(openAction);
-		fileMenu.add(saveAction);
+        fileMenu.add(openAction);
+        fileMenu.add(saveAction);
 
-		JFrame frame = new JFrame(title);
+        JMenuItem cutAction = new JMenuItem("Cut");
+        JMenuItem copyAction = new JMenuItem("Copy");
+        JMenuItem pasteAction = new JMenuItem("Paste");
+        editMenu.add(cutAction);
+        editMenu.add(copyAction);
+        editMenu.add(pasteAction);
+
+        JFrame frame = new JFrame(title);
 		frame.setJMenuBar(menuBar);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -88,6 +97,27 @@ public class Editor {
 				text.saveToFile();
 			}
 		});
+
+		cutAction.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                viewer.cut();
+            }
+        });
+
+		copyAction.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                viewer.copy();
+            }
+        });
+
+		pasteAction.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                viewer.paste();
+            }
+        });
 
 		return frame;
 	}

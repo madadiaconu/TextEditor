@@ -521,4 +521,21 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 		if (caret != null) invertCaret();
 		if (selection != null) invertSelection(selection.getBeg(), selection.getEnd());
 	}
+
+	public void cut() {
+		if (selection != null) {
+			text.cut(selection.getBeg().getPosInText(), selection.getEnd().getPosInText());
+		}
+	}
+
+	public void copy() {
+		if (selection != null) {
+			text.copy(selection.getBeg().getPosInText(), selection.getEnd().getPosInText());
+		}
+	}
+
+	public void paste() {
+		text.paste(caret.getPosInText());
+
+	}
 }
