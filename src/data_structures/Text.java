@@ -4,6 +4,7 @@ import gui.event_handling.UpdateEvent;
 import gui.event_handling.UpdateEventListener;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -21,6 +22,10 @@ public abstract class Text {
     public abstract void updateFontForSelection(Font font, int from, int to);
 
     public Text (String fn) {
+
+    }
+
+    public Text (File file) {
 
     }
 

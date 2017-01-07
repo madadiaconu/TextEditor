@@ -26,6 +26,15 @@ public class PieceListText extends Text {
         firstPiece.setNext(new Piece(len, new File(fn), 0));
     }
 
+    public PieceListText(File file) {
+        super(file);
+        scratch = new File("scratch_file");
+        scratch.delete();
+        firstPiece = new Piece();
+        len = file.length();
+        firstPiece.setNext(new Piece(len, file, 0));
+    }
+
     public Piece getFirstPiece() {
         return firstPiece.getNext(); //skip the dummy piece at the beginning
     }
@@ -113,6 +122,10 @@ public class PieceListText extends Text {
         return cur;
     }
 
+    public Font getFontForPosition (int pos) {
+        return getPieceForPosition(pos).getFont();
+    }
+
     /**
      * @param searchedForPiece
      * @return length up to the piece, including it
@@ -139,5 +152,4 @@ public class PieceListText extends Text {
             }
         }
     }
-
 }

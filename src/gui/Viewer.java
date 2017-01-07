@@ -1,6 +1,6 @@
 package gui;
 
-import data_structures.Text;
+import data_structures.PieceListText;
 import gui.event_handling.UpdateEvent;
 import gui.event_handling.UpdateEventListener;
 
@@ -20,7 +20,7 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 	static final int    EOF = '\0';
 	static final String CRLF = "\r\n";
 
-	Text text;
+	PieceListText text;
 	Line firstLine = null; // the lines in this viewer
 	int firstVisibleTextPos = 0;     // first text position in this viewer
 	int lastVisibleTextPos;          // last text position in this viewer
@@ -31,7 +31,8 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 	Position lastMousePos;      // last mouse position: used during mouse dragging
 	Graphics g;
 
-	public Viewer(Text t, JScrollBar sb, JComboBox<Font> cb) {
+	public Viewer(PieceListText t, JScrollBar sb, JComboBox<Font> cb) {
+        g = getGraphics();
 		scrollBar = sb;
 		scrollBar.addAdjustmentListener(this);
 		scrollBar.setMaximum((int)t.length());
@@ -56,6 +57,7 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 					text.updateFontForSelection((Font) itemEvent.getItem(),
 							selection.getBeg().getPosInText(),
 							selection.getEnd().getPosInText());
+					rebuildFrom(selection.getBeg());
 				}
 			}
 		});
@@ -129,11 +131,11 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 			pos.setY(line.getBase());
 			pos.setLine(line);
 			pos.setPosInLine(textPos - pos.getPosFirstCharInText());
-			FontMetrics m = g.getFontMetrics();
+			FontMetrics fontMetrics = g.getFontMetrics();
 			int i = pos.getPosFirstCharInText();
 			while (i < textPos) {
 				char ch = text.charAt(i); i++;
-				pos.setX(pos.getX() + charWidth(m, ch));
+				pos.setX(pos.getX() + charWidth(fontMetrics, ch));
 			}
 		}
 		pos.setPosInText(pos.getPosFirstCharInText() + pos.getPosInLine());
@@ -159,14 +161,14 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 			if (pos.getPosFirstCharInText() + line.getLen() < text.length()) pos.setPosInLine(pos.getPosInLine() - 2);
 		} else {
 			pos.setX(line.getX());
-			FontMetrics m = g.getFontMetrics();
+			FontMetrics fontMetrics = g.getFontMetrics(getFontForPosition(pos.getPosInText()));
 			int i = pos.getPosFirstCharInText();
 			char ch = text.charAt(i);
-			int w = charWidth(m, ch);
+			int w = charWidth(fontMetrics, ch);
 			while (x >= pos.getX() + w) {
 				pos.setX(pos.getX() + w);
 				i++; ch = text.charAt(i);
-				w = charWidth(m, ch);
+				w = charWidth(fontMetrics, ch);
 			}
 			pos.setPosInLine(i - pos.getPosFirstCharInText());
 		}
@@ -354,10 +356,38 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 		return m.stringWidth(s1);
 	}
 
+    /**
+     * @param firstPosition relative to the text
+     * @param lastPosition relative to the text
+     * @param string the string
+     * @return the string width
+     */
+	private int stringWidth(int firstPosition, int lastPosition, String string) {
+        int width = 0;
+        g = getGraphics();
+        if (text != null) {
+            for (int i = firstPosition, j=0; i < lastPosition; i++, j++) {
+                FontMetrics fontMetrics = g.getFontMetrics(getFontForPosition(i));
+                width += fontMetrics.charWidth(string.charAt(j));
+            }
+            return width;
+        }
+        return g.getFontMetrics().stringWidth(string);
+    }
+
 	private void drawString(Graphics g, String s, int x, int y) {
 		String s1 = s.replaceAll("\t", "    ");
 		g.drawString(s1, x, y);
 	}
+
+	private Font getFontForPosition (int pos) {
+	    Font font = text.getFontForPosition(pos);
+	    if (font != null) {
+	        return font;
+        }
+        g = getGraphics();
+        return g.getFontMetrics().getFont();
+    }
 
 /*------------------------------------------------------------
 *  line handling
@@ -375,7 +405,9 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 				first = line = new Line();
 			} else {
 				Line prev = line;
-				line.setNext(new Line()); line = line.getNext(); line.setPrev(prev);
+				line.setNext(new Line());
+				line = line.getNext();
+				line.setPrev(prev);
 			}
 			StringBuffer buf = new StringBuffer();
 			while (ch != '\n' && ch != EOF) {
@@ -473,10 +505,6 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
 		pos.getLine().setLen(pos.getLine().getLen() + ch.length());
 		lastVisibleTextPos += ch.length();
 		repaint(pos.getLine().getX(), pos.getLine().getY(), getWidth(), pos.getLine().getH()+1);
-	}
-
-	private void updateAfterDelete() {
-
 	}
 
 	public void paint(Graphics g) {
