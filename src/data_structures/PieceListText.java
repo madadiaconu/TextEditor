@@ -5,6 +5,8 @@ import gui.event_handling.UpdateEvent;
 import java.awt.*;
 import java.io.*;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Madalina Diaconu on 03.01.17.
@@ -155,19 +157,24 @@ public class PieceListText extends Text {
     }
 
     public void saveToFile() {
-        Piece currentPiece = firstPiece;
-        StringBuilder fileContent = new StringBuilder();
-        while (currentPiece != null) {
-            fileContent.append(getTextInPiece(currentPiece));
-            currentPiece = currentPiece.getNext();
-        }
+        String fileContent = getAllText();
         File fileToBeSaved = new File("file"+System.currentTimeMillis());
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(fileToBeSaved, true), "UTF-8"))) {
-            writer.write(fileContent.toString());
+            writer.write(fileContent);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getAllText() {
+        Piece currentPiece = firstPiece;
+        StringBuilder content = new StringBuilder();
+        while (currentPiece != null) {
+            content.append(getTextInPiece(currentPiece));
+            currentPiece = currentPiece.getNext();
+        }
+        return content.toString();
     }
 
     private String getTextInPiece (Piece piece) {
@@ -218,5 +225,21 @@ public class PieceListText extends Text {
 
     public String getClipboard() {
         return clipboard;
+    }
+
+    public List<Integer> find (String term) {
+        List<Integer> positions = new ArrayList<>();
+        String content = getAllText();
+        int pos = content.indexOf(term);
+        int totalPos = pos; //position with respect to the original text
+        while (pos != -1) {
+            positions.add(totalPos);
+            pos += term.length(); //skip the term we just found
+            totalPos += term.length();
+            content = content.substring(pos);
+            pos = content.indexOf(term); //keep adding to pos because we want the position in the original text
+            totalPos += pos;
+        }
+        return positions;
     }
 }

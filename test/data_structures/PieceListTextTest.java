@@ -199,6 +199,33 @@ public class PieceListTextTest {
         assertThat(result.get(2)).isEqualTo("Linine 3\n");
     }
 
+    @Test
+    public void find() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        List<Integer> positions = text.find("Line 3");
+        assertThat(positions.size()).isEqualTo(1);
+        assertThat(positions.get(0)).isEqualTo(8);
+    }
+
+    @Test
+    public void findMultiple() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        List<Integer> positions = text.find("ine");
+        assertThat(positions.size()).isEqualTo(2);
+        assertThat(positions.get(0)).isEqualTo(1);
+        assertThat(positions.get(1)).isEqualTo(9);
+    }
+
+    @Test
+    public void findNone() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        List<Integer> positions = text.find("zzz");
+        assertThat(positions.size()).isEqualTo(0);
+    }
+
     private List<String> getLines(PieceListText list) {
         List<String> result = new ArrayList<>();
         int pos = 0;
