@@ -85,7 +85,7 @@ public class Editor {
 		saveAction.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-
+				text.saveToFile();
 			}
 		});
 

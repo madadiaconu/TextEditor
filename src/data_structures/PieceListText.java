@@ -152,4 +152,39 @@ public class PieceListText extends Text {
             }
         }
     }
+
+    public void saveToFile() {
+        Piece currentPiece = firstPiece;
+        StringBuilder fileContent = new StringBuilder();
+        while (currentPiece != null) {
+            fileContent.append(getTextInPiece(currentPiece));
+            currentPiece = currentPiece.getNext();
+        }
+        File fileToBeSaved = new File("file"+System.currentTimeMillis());
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(fileToBeSaved, true), "UTF-8"))) {
+            writer.write(fileContent.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getTextInPiece (Piece piece) {
+        if (piece.getFile() != null) {
+            try (InputStream in = new FileInputStream(piece.getFile())) {
+                Reader reader = new InputStreamReader(in, "UTF-8");
+                int r;
+                reader.skip(piece.getFilePos());
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < piece.getLen(); i++) {
+                    stringBuilder.append((char)reader.read());
+                }
+                return stringBuilder.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+        return "";
+    }
 }
