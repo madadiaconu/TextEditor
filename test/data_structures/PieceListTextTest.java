@@ -2,6 +2,7 @@ package data_structures;
 
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -121,6 +122,39 @@ public class PieceListTextTest {
         assertThat(result.get(0)).isEqualTo("LHee 1\n");
         assertThat(result.get(1)).isEqualTo("\n");
         assertThat(result.get(2)).isEqualTo("Line 3\n");
+    }
+
+    @Test
+    public void updateFontForSelection() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        Font font = GraphicsEnvironment.
+                getLocalGraphicsEnvironment().getAllFonts()[0];
+        text.updateFontForSelection(font, 1, 4);
+        Piece firstPiece = text.getFirstPiece();
+        Piece secondPiece = firstPiece.getNext();
+        Piece thirdPiece = secondPiece.getNext();
+        assertThat(firstPiece.getFont()).isEqualTo(null);
+        assertThat(secondPiece.getFont()).isEqualTo(font);
+        assertThat(thirdPiece.getFont()).isEqualTo(null);
+    }
+
+    @Test
+    public void updateFontForSelectionAcrossPieces() throws FileNotFoundException {
+        String path = getFilePath("/test1");
+        PieceListText text = new PieceListText(path);
+        text.insert(3,"Hello"); //at this point, there are already 3 pieces
+        Font font = GraphicsEnvironment.
+                getLocalGraphicsEnvironment().getAllFonts()[0];
+        text.updateFontForSelection(font, 1, 5); //at this point, we have 5 pieces
+        Piece firstPiece = text.getFirstPiece();
+        Piece secondPiece = firstPiece.getNext();
+        Piece thirdPiece = secondPiece.getNext();
+        assertThat(firstPiece.getFont()).isEqualTo(null);
+        assertThat(secondPiece.getFont()).isEqualTo(font);
+        assertThat(thirdPiece.getFont()).isEqualTo(font);
+        assertThat(thirdPiece.getNext().getFont()).isEqualTo(null);
+        assertThat(thirdPiece.getNext().getNext().getFont()).isEqualTo(null);
     }
 
     private List<String> getLines(PieceListText list) {

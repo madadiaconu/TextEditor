@@ -1,6 +1,8 @@
 package data_structures;
 
 import gui.event_handling.UpdateEvent;
+
+import java.awt.*;
 import java.io.*;
 
 
@@ -10,8 +12,8 @@ import java.io.*;
  */
 public class PieceListText extends Text {
 
-    Piece firstPiece;
-    File scratch;
+    private Piece firstPiece;
+    private File scratch;
 
     public PieceListText(String fn) throws FileNotFoundException {
         super(fn);
@@ -22,6 +24,10 @@ public class PieceListText extends Text {
         File f = new File(fn);
         len = f.length();
         firstPiece.setNext(new Piece(len, new File(fn), 0));
+    }
+
+    public Piece getFirstPiece() {
+        return firstPiece.getNext(); //skip the dummy piece at the beginning
     }
 
     public void insert (int pos, String s) {
@@ -120,4 +126,18 @@ public class PieceListText extends Text {
         }
         return len;
     }
+
+    public void updateFontForSelection(Font font, int from, int to) {
+        Piece currentPiece = split(from).getNext(); //get first piece of selection
+        Piece lastPieceInSelection = split(to);
+        currentPiece.setFont(font);
+        if (currentPiece != lastPieceInSelection) {
+            lastPieceInSelection.setFont(font);
+            while (currentPiece.getNext() != lastPieceInSelection) {
+                currentPiece.setFont(font);
+                currentPiece = currentPiece.getNext();
+            }
+        }
+    }
+
 }

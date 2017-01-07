@@ -49,14 +49,16 @@ public class Viewer extends Canvas implements AdjustmentListener, UpdateEventLis
                 return this;
             }
         });
-		fontDropDown.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (selection != null) {
-
-                }
-            }
-        });
+		fontDropDown.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent itemEvent) {
+				if (selection != null) {
+					text.updateFontForSelection((Font) itemEvent.getItem(),
+							selection.getBeg().getPosInText(),
+							selection.getEnd().getPosInText());
+				}
+			}
+		});
 		text = t;
 		text.addUpdateEventListener(this);
 		this.addKeyListener(new KeyAdapter() {

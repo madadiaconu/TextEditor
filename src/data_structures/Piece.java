@@ -66,4 +66,8 @@ public class Piece { // descriptor
     public void setLen(long len) {
         this.len = len;
     }
+
+    public void setFont(Font font) {
+        this.font = font;
+    }
 }
