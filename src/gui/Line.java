@@ -42,6 +42,14 @@ public class Line {
         this.y = y;
     }
 
+    public int getBase() {
+        return base;
+    }
+
+    public void setBase(int base) {
+        this.base = base;
+    }
+
     public int getW() {
         return w;
     }
@@ -56,14 +64,6 @@ public class Line {
 
     public void setH(int h) {
         this.h = h;
-    }
-
-    public int getBase() {
-        return base;
-    }
-
-    public void setBase(int base) {
-        this.base = base;
     }
 
     public Line getPrev() {

@@ -2,9 +2,9 @@ package data_structures;
 
 import gui.event_handling.UpdateEvent;
 
-import java.awt.*;
+import javax.swing.JLabel;
+import java.awt.Font;
 import java.io.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +13,14 @@ import java.util.List;
  * Data structure used to manage text
  */
 public class PieceListText extends Text {
+    private static final Font DEFAULT_FONT = new JLabel().getFont();
+    private static final CharDescriptor EOF_DESCRIPTOR = new CharDescriptor('\0', DEFAULT_FONT);
 
     private Piece firstPiece;
     private File scratch;
     private String clipboard;
 
     public PieceListText(String fn) throws FileNotFoundException {
-        super(fn);
         scratch = new File("scratch_file");
         scratch.delete();
         FileInputStream s = new FileInputStream(fn);
@@ -30,7 +31,6 @@ public class PieceListText extends Text {
     }
 
     public PieceListText(File file) {
-        super(file);
         scratch = new File("scratch_file");
         scratch.delete();
         firstPiece = new Piece();
@@ -90,8 +90,8 @@ public class PieceListText extends Text {
     }
 
     @Override
-    public char charAt(int pos) {
-        if (pos < 0 || pos >= len) return '\0';
+    public CharDescriptor charAt(int pos) {
+        if (pos < 0 || pos >= len) return EOF_DESCRIPTOR;
         Piece p = getPieceForPosition(pos);
         while (p.getLen() == 0) { //ignore dummy pieces
             p = p.getNext();
@@ -102,12 +102,16 @@ public class PieceListText extends Text {
             reader.skip(p.getFilePos()+(pos - (getLenUntilPiece(p) - p.getLen())));
             r =  reader.read();
             if (r == -1) {
-                return '\0';
+                return EOF_DESCRIPTOR;
             }
-            return (char) r;
+            Font font = p.getFont();
+            if (font == null) {
+            	font = DEFAULT_FONT;
+            }
+            return new CharDescriptor((char)r, font);
         } catch (IOException e) {
             e.printStackTrace();
-            return '\0';
+            return EOF_DESCRIPTOR;
         }
     }
 

@@ -3,8 +3,7 @@ package data_structures;
 import gui.event_handling.UpdateEvent;
 import gui.event_handling.UpdateEventListener;
 
-import java.awt.*;
-import java.io.File;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,16 +17,10 @@ public abstract class Text {
 
     public abstract void insert(int pos, String s);
     public abstract void delete(int from, int to);
-    public abstract char charAt(int pos);
+
+    public abstract CharDescriptor charAt(int pos);
+
     public abstract void updateFontForSelection(Font font, int from, int to);
-
-    public Text (String fn) {
-
-    }
-
-    public Text (File file) {
-
-    }
 
     public long length() {
         return len;

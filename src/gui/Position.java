@@ -4,17 +4,17 @@ package gui;
  * Created by Diaconu Madalina on 06.01.17.
  */
 public class Position {
-    private Line line; // line containing this position
+    private LineEx line; // line containing this position
     private int x, y;  // base line point corresponding to this position
     private int posInText;  // text position (relative to start of text)
     private int posFirstCharInText;   // origin (text position of first character in this line)
     private int posInLine;   // text offset from posFirstCharInText
 
-    public Line getLine() {
+    public LineEx getLine() {
         return line;
     }
 
-    public void setLine(Line line) {
+    public void setLine(LineEx line) {
         this.line = line;
     }
 
